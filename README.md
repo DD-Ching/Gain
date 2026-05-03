@@ -14,7 +14,7 @@ regulatory-element registries.
 
 ## What ships today
 
-Three small, stdlib-only CLIs. No package install. No new dependencies.
+Four small, stdlib-only CLIs. No package install. No new dependencies.
 No framework.
 
 | Script | Reads | Writes | Purpose |
@@ -22,6 +22,7 @@ No framework.
 | [`scripts/gain_manifest.py`](scripts/gain_manifest.py) | [`metadata/sources.json`](metadata/sources.json) | [`metadata/manifest.{csv,json,md}`](metadata/) | Aggregate the hand-curated lung-development source list into one unified manifest in three formats. |
 | [`scripts/gain_verify.py`](scripts/gain_verify.py) | [`metadata/sources.json`](metadata/sources.json) | [`metadata/verification.json`](metadata/verification.json) | Probe every source URL live; record HTTP status, content type, and any error. Surfaces drift between curated pointers and reality. |
 | [`scripts/gain_switch_explorer.py`](scripts/gain_switch_explorer.py) | [`metadata/switch_hierarchy.csv`](metadata/switch_hierarchy.csv) + [`metadata/sources.json`](metadata/sources.json) | [`notes/switch_hierarchy.md`](notes/switch_hierarchy.md) | Render the gene/pathway hierarchy (NKX2-1 / SOX2 / SOX9 / FGF10 / WNT / BMP / SHH / airway / alveolar) joined with the manifest into a per-node evidence report. |
+| [`scripts/gain_evidence_audit.py`](scripts/gain_evidence_audit.py) | [`metadata/regulator_target_pairs.csv`](metadata/regulator_target_pairs.csv) | [`metadata/evidence_audit.csv`](metadata/evidence_audit.csv) | **Q3 audit.** For each TF→target pair in the lung-development chain, query ENCODE for human-lung / human-other / mouse TF ChIP-seq and assign an evidence class. Surfaces what the public ChIP record actually supports vs. what is mouse-extrapolated or literature-curated. |
 
 ## Quickstart
 
@@ -31,6 +32,7 @@ Requires only Python 3.9+.
 python3 scripts/gain_manifest.py          # build the manifest
 python3 scripts/gain_verify.py            # probe sources live
 python3 scripts/gain_switch_explorer.py   # render the hierarchy report
+python3 scripts/gain_evidence_audit.py    # run the Q3 ENCODE evidence audit
 ```
 
 Each script supports `--help`. Useful overrides:
@@ -44,6 +46,9 @@ python3 scripts/gain_verify.py --timeout 20 --sleep 1.0
 
 # Switch explorer: render to a different output path
 python3 scripts/gain_switch_explorer.py --out /tmp/switch.md
+
+# Evidence audit: slower pacing if ENCODE rate-limits
+python3 scripts/gain_evidence_audit.py --sleep 0.5
 ```
 
 ## Repository layout
@@ -58,19 +63,21 @@ scripts/    three stdlib-only CLIs (manifest / verify / switch-explorer)
 
 In order:
 
-1. [notes/evidence_map.md](notes/evidence_map.md) — project goal, scientific
-   scope, the public resources that matter, and the candidate MVPs.
-2. [notes/mvp_decision.md](notes/mvp_decision.md) — why the manifest CLI was
-   chosen as v0 and why the alternatives were deferred.
-3. [notes/switch_hierarchy.md](notes/switch_hierarchy.md) — the rendered
-   per-gene / per-pathway evidence report (the v1.5 output most users
-   actually want to read).
-4. [metadata/](metadata/) — six per-resource profiles (`resource_*.md`), the
-   cross-resource summary CSV, and the curated inputs (`sources.json`,
-   `switch_hierarchy.csv`).
-5. [notes/limits.md](notes/limits.md) — what this v0/v1/v1.5 explicitly does *not* do.
-6. [notes/roadmap.md](notes/roadmap.md) — what is next (v0.x hygiene, v1.x
-   verifier hardening, v2 deferred MVPs).
+1. [notes/reality_check.md](notes/reality_check.md) — what is curated
+   infrastructure here vs. what would count as genuine added value.
+2. [notes/unresolved_questions.md](notes/unresolved_questions.md) — the
+   three middle-layer questions Gain is actually trying to answer.
+3. [notes/evidence_audit.md](notes/evidence_audit.md) — **the Q3 result**:
+   classification of 18 canonical TF→target pairs by ENCODE evidence class,
+   with the most important missing-evidence gaps named.
+4. [notes/q3_design.md](notes/q3_design.md) — the audit's design contract
+   (scope, classes, edge cases, what counts vs. doesn't count as evidence).
+5. [notes/switch_hierarchy.md](notes/switch_hierarchy.md) — per-gene /
+   per-pathway evidence report joined with the manifest.
+6. [metadata/](metadata/) — per-resource profiles, curated inputs,
+   generated outputs.
+7. [notes/limits.md](notes/limits.md) — what the current artifacts do *not* do.
+8. [notes/roadmap.md](notes/roadmap.md) — what is next.
 
 ## Constraints baked into this repo
 

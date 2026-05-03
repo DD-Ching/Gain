@@ -30,6 +30,27 @@ alveolar_program to relevant manifest sources) +
 against `sources.json`, joins in modality/stage/tissue, renders
 `notes/switch_hierarchy.md`).
 
+## v2 — Q3 evidence audit (first answer to a real question) ✅ shipped
+
+`scripts/gain_evidence_audit.py` reads
+`metadata/regulator_target_pairs.csv` (18 hand-curated TF→target pairs),
+issues three ENCODE search queries per regulator (human lung / human any /
+mouse any), and emits `metadata/evidence_audit.csv` with a class per pair
+plus full justification.
+
+**First run, 2026-05-03:** 0 direct_human_evidence, 4 indirect_human_evidence
+(SMAD1→ID1/ID2, GLI2→PTCH1/GLI1), 0 mouse_supported_only, 14
+literature_curation_only. The full result and the most important
+missing-evidence gaps are reported in
+[`notes/evidence_audit.md`](evidence_audit.md). The headline finding
+is that the textbook NKX2-1 / SOX2 / SOX9 / CTNNB1 regulatory chain
+has zero ENCODE TF ChIP-seq support in any species or biosample —
+absence of public data, not absence of relationship.
+
+This is the first artifact in the repo that answers a real question
+rather than curating known biology. See
+[`notes/q3_design.md`](q3_design.md) for the full design contract.
+
 ## v0.x — manifest hygiene (open)
 
 Small mechanical extensions that make the existing CLIs nicer.
@@ -60,9 +81,25 @@ Small mechanical extensions that make the existing CLIs nicer.
 - [ ] Optional `--only-failed` mode for re-checking just the
       previously-failing URLs (useful while iterating on fixes).
 
+## v2.x — Q3 evidence-audit hardening (open)
+
+- [ ] **Peak intersection**: parse the BED files referenced by each
+      relevant ENCODE experiment and check whether the regulator's
+      ChIP peaks fall within ±50 kb of the target gene's TSS. Promotes
+      `indirect_human_evidence` rows from "the data exists" to
+      "the data supports / does not support this specific link."
+- [ ] **Motif scanning** to populate the `accessibility_only_support`
+      class (lung ATAC/DNase + JASPAR motif → plausible regulator
+      binding when no ChIP exists).
+- [ ] **Non-ENCODE ChIP repositories** (ChIPAtlas, Cistrome, ReMap):
+      a regulator with no ENCODE ChIP may have published ChIP elsewhere.
+      Add a second backend with the same evidence-class output schema.
+- [ ] **Cross-species lift-over**: when only mouse ChIP exists, lift
+      mouse peak coordinates to human and re-test the locus question.
+
 ## v2+ — the remaining deferred MVPs
 
-In the order they become tractable now that v0/v1/v1.5 are live:
+In the order they become tractable now that v0/v1/v1.5/v2 are live:
 
 - **lung-switch-explorer (live data)** — extend `gain_switch_explorer`
   beyond the curated CSV: given a CELLxGENE Census query for fetal
