@@ -1,0 +1,140 @@
+{
+  "schema_version": "0.1",
+  "scope": "Lung-development-relevant datasets and tracks bearing on the NKX2-1 -> SOX2/SOX9 -> FGF10/WNT/BMP/SHH -> airway/alveolar regulatory axis.",
+  "curation_method": "human-curated; entries are pointers, not validated accessions. Every entry must be re-checked against its source portal before being relied on for analysis.",
+  "last_updated": "2026-05-03",
+  "sources": [
+    {
+      "source": "CELLxGENE Census",
+      "dataset_name": "HLCA - Human Lung Cell Atlas (core)",
+      "modality": "scRNA-seq",
+      "stage": "adult",
+      "tissue": "lung",
+      "access_method": "Python SDK (cellxgene-census)",
+      "programmatic_access": "https://chanzuckerberg.github.io/cellxgene-census/",
+      "reuse_priority": "high",
+      "notes": "Sikkema et al. 2023 Nat Med; ~2.4M cells, ~486 donors; integrated with scANVI. Query: tissue_general=='lung' filtered to HLCA core dataset_ids."
+    },
+    {
+      "source": "CELLxGENE Census",
+      "dataset_name": "HLCA - Human Lung Cell Atlas (extended)",
+      "modality": "scRNA-seq",
+      "stage": "adult + disease",
+      "tissue": "lung",
+      "access_method": "Python SDK (cellxgene-census)",
+      "programmatic_access": "https://chanzuckerberg.github.io/cellxgene-census/",
+      "reuse_priority": "medium",
+      "notes": "Disease-extended HLCA; useful as a contrast to development but not the primary developmental signal."
+    },
+    {
+      "source": "CELLxGENE Census",
+      "dataset_name": "Pan-fetal human cell atlas (Cao et al. 2020)",
+      "modality": "scRNA-seq",
+      "stage": "fetal",
+      "tissue": "multi-organ incl. lung",
+      "access_method": "Python SDK (cellxgene-census)",
+      "programmatic_access": "https://chanzuckerberg.github.io/cellxgene-census/",
+      "reuse_priority": "high",
+      "notes": "Cao et al. 2020 Science; fetal cell atlas. Lung subset gives proximal/distal progenitor coverage. Verify the dataset is currently indexed in Census before relying on it."
+    },
+    {
+      "source": "CELLxGENE Census",
+      "dataset_name": "Human fetal lung atlas (He et al. 2022)",
+      "modality": "scRNA-seq + spatial",
+      "stage": "fetal",
+      "tissue": "lung",
+      "access_method": "Python SDK (cellxgene-census) or h5ad download",
+      "programmatic_access": "https://chanzuckerberg.github.io/cellxgene-census/",
+      "reuse_priority": "high",
+      "notes": "He et al. 2022 Nat Genet; fetal lung scRNA-seq with spatial. Verify Census coverage; if absent, fall back to the paper's GEO accession."
+    },
+    {
+      "source": "LungMAP",
+      "dataset_name": "LungMAP human developmental scRNA-seq projects",
+      "modality": "scRNA-seq",
+      "stage": "fetal + postnatal",
+      "tissue": "lung",
+      "access_method": "Azul REST API (/index/projects)",
+      "programmatic_access": "https://data-browser.lungmap.net/apis",
+      "reuse_priority": "high",
+      "notes": "Project-level metadata + downloadable matrix files. Verify the LungMAP-specific Azul base URL at use time."
+    },
+    {
+      "source": "LungMAP",
+      "dataset_name": "LungMAP mouse developmental scRNA-seq projects",
+      "modality": "scRNA-seq",
+      "stage": "embryonic + postnatal (mouse)",
+      "tissue": "lung",
+      "access_method": "Azul REST API (/index/projects)",
+      "programmatic_access": "https://data-browser.lungmap.net/apis",
+      "reuse_priority": "medium",
+      "notes": "Mouse comparator across the same developmental stages; useful for cross-species validation of regulator-target predictions."
+    },
+    {
+      "source": "LungMAP",
+      "dataset_name": "Lung CellCards (curated cell-type definitions)",
+      "modality": "ontology / curated markers",
+      "stage": "all",
+      "tissue": "lung",
+      "access_method": "Web UI; curated markers downloadable",
+      "programmatic_access": "https://www.lungmap.net/cell-cards/",
+      "reuse_priority": "medium",
+      "notes": "Use as an editorial cross-check against Census-derived marker gene lists."
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "NKX2-1 ChIP-seq experiments (any biosample)",
+      "modality": "ChIP-seq",
+      "stage": "varies",
+      "tissue": "varies (lung-relevant subset is small)",
+      "access_method": "REST API search",
+      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=NKX2-1&format=json",
+      "reuse_priority": "medium",
+      "notes": "Lung-specific NKX2-1 ChIP coverage is patchy; record what exists, including non-lung biosamples for sanity checks. Honor 10 GET/sec."
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "SOX2 ChIP-seq experiments (any biosample)",
+      "modality": "ChIP-seq",
+      "stage": "varies",
+      "tissue": "varies",
+      "access_method": "REST API search",
+      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=SOX2&format=json",
+      "reuse_priority": "medium",
+      "notes": "SOX2 marks proximal airway progenitors; lung-context ChIP is rare but ESC/neural-context tracks may inform motif use."
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "SOX9 ChIP-seq experiments (any biosample)",
+      "modality": "ChIP-seq",
+      "stage": "varies",
+      "tissue": "varies",
+      "access_method": "REST API search",
+      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=SOX9&format=json",
+      "reuse_priority": "medium",
+      "notes": "SOX9 marks distal/alveolar progenitors. Same caveat as SOX2 about lung-context coverage."
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "Lung biosample ATAC-seq / DNase-seq",
+      "modality": "ATAC-seq / DNase-seq",
+      "stage": "fetal + adult (subset)",
+      "tissue": "lung",
+      "access_method": "REST API search",
+      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ATAC-seq&biosample_ontology.classification=tissue&biosample_ontology.term_name=lung&format=json",
+      "reuse_priority": "medium",
+      "notes": "Chromatin accessibility complements ChIP for inferring active CREs in lung tissue."
+    },
+    {
+      "source": "SCREEN",
+      "dataset_name": "Candidate cis-regulatory elements (cCREs) - human lung biosamples",
+      "modality": "cCRE registry",
+      "stage": "varies",
+      "tissue": "lung biosamples (subset)",
+      "access_method": "Web UI + GraphQL API + bulk files",
+      "programmatic_access": "https://screen.wenglab.org/",
+      "reuse_priority": "low",
+      "notes": "Defer to v1. Used for marker-to-regulator linker MVP. Verify endpoint version (V3 era) before scripting."
+    }
+  ]
+}
