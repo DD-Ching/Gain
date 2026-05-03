@@ -1,0 +1,19 @@
+regulator,target,relationship_type,from_layer,to_layer,literature_summary
+NKX2-1,SFTPC,master_to_output,master_regulator,output_program,Canonical NKX2-1 binding at the SFTPC promoter drives surfactant protein C expression in alveolar type 2 cells; established by Bohinski et al. 1994 and many follow-ups.
+NKX2-1,SFTPB,master_to_output,master_regulator,output_program,NKX2-1 binds the SFTPB promoter and is required for surfactant B expression; canonical alveolar target.
+NKX2-1,SCGB1A1,master_to_output,master_regulator,output_program,NKX2-1 contributes to SCGB1A1 (CC10/CCSP) regulation in club/secretory cells; airway-axis target.
+NKX2-1,ABCA3,master_to_output,master_regulator,output_program,NKX2-1 binds the ABCA3 regulatory region; alveolar lipid transporter for surfactant lamellar bodies.
+NKX2-1,SOX2,master_to_progenitor,master_regulator,progenitor_marker,Reciprocal regulation between NKX2-1 and SOX2 has been proposed in lung-development reviews; direct binding evidence is limited to mouse loss-of-function inference.
+NKX2-1,SOX9,master_to_progenitor,master_regulator,progenitor_marker,NKX2-1 is co-expressed with SOX9 in distal tip progenitors; direct regulatory relationship is mostly inferred from mouse genetics.
+NKX2-1,FOXA2,master_to_master,master_regulator,master_regulator,FOXA2 cooperates with NKX2-1 in lung epithelial gene regulation; direct binding documented in mouse but not human ChIP.
+SOX2,KRT5,progenitor_to_output,progenitor_marker,output_program,SOX2 expression precedes basal-cell KRT5 expression in airway development; relationship inferred mostly from mouse and ESC-derived organoid work.
+SOX2,TP63,progenitor_to_output,progenitor_marker,output_program,SOX2 and TP63 cooperatively specify basal-cell identity; relationship from mouse and human organoid studies.
+SOX2,MUC5B,progenitor_to_output,progenitor_marker,output_program,SOX2 is upstream of secretory-cell programs including MUC5B; mouse-derived relationship.
+SOX9,SFTPC,progenitor_to_output,progenitor_marker,output_program,SOX9+ distal tip cells give rise to AT2 cells expressing SFTPC; lineage tracing in mouse and inferred in human via fetal scRNA-seq.
+SOX9,ID2,progenitor_to_output,progenitor_marker,output_program,SOX9 and ID2 co-mark distal tip cells; relationship is co-expression rather than confirmed direct regulation.
+CTNNB1,AXIN2,pathway_effector_to_target,signaling_effector,output_program,Beta-catenin (CTNNB1) drives AXIN2 expression as a canonical WNT pathway target via TCF/LEF binding.
+CTNNB1,LEF1,pathway_effector_to_target,signaling_effector,output_program,Canonical WNT target with feedback regulation; LEF1 is the DNA-binding partner that beta-catenin activates.
+SMAD1,ID1,pathway_effector_to_target,signaling_effector,output_program,BMP signaling activates SMAD1/5/8 which drive ID1 expression; canonical BMP target.
+SMAD1,ID2,pathway_effector_to_target,signaling_effector,output_program,SMAD1 also activates ID2 in BMP-responsive cells.
+GLI2,PTCH1,pathway_effector_to_target,signaling_effector,output_program,GLI2 (the SHH-pathway effector) drives PTCH1 transcription; canonical SHH target with feedback regulation.
+GLI2,GLI1,pathway_effector_to_target,signaling_effector,output_program,GLI2 transcriptionally upregulates GLI1 in the SHH feedback loop.
