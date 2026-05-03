@@ -1,33 +1,48 @@
-# Limits — what the v0 manifest CLI does *not* do
+# Limits — what the current artifacts do *not* do
 
 Recording these explicitly so neither future-us nor anyone reading the repo
-mistakes the manifest for something it isn't.
+mistakes the manifest, verifier, or switch-hierarchy explorer for something
+they aren't.
 
 ## Curation, not validation
 
-- Entries in `metadata/sources.json` are **pointers**, not validated
-  accessions. Each `programmatic_access` URL has been spelled correctly
-  and the relevant API documented; **none have been programmatically
-  hit and confirmed to return data right now**.
-- The `notes` field flags datasets that should be re-verified before use
-  (e.g., "Verify Census coverage; if absent, fall back to GEO accession.").
+- Entries in `metadata/sources.json` and edges in
+  `metadata/switch_hierarchy.csv` are **pointers**, not validated
+  accessions. The verifier (`scripts/gain_verify.py`) probes whether the
+  URL responds at all; it does **not** check that the URL returns the
+  *right* data.
+- The `notes` field in `sources.json` flags datasets that should be
+  re-verified before use (e.g., "Verify Census coverage; if absent,
+  fall back to GEO accession.").
 - We have not asserted that any specific dataset_id, accession ID, or
   experiment ID exists in its portal. We name papers and queries; we do
   not name accession IDs we have not personally fetched.
 
-## No live data fetches
+## What the verifier does and does not catch
 
-- The CLI does **zero HTTP** in v0.
-- No download of `.h5ad` files, no Census `obs.read()`, no ENCODE
-  `/search/?...&format=json` calls. That is v1 work.
+- **Catches:** unreachable URLs, 4xx/5xx status codes, timeouts, TLS
+  errors, content-type changes (recorded in `verification.json`), rate-
+  limit responses (429).
+- **Does not catch:** schema drift inside a 200 OK payload (e.g., a
+  field renamed from `target.label` to `target.genes.symbol`), data
+  staleness (a portal serving last year's snapshot), or licensing
+  changes. Those still require human attention.
+- The first live run found **3 ENCODE TF-ChIP search URLs returning 404
+  and SCREEN returning 429** — see `metadata/verification.json`. Those
+  are documented in `notes/roadmap.md` as v0.x hygiene items, not
+  silently masked.
 
-## No analysis
+## No analysis on data, only on metadata
 
 - No expression matrices loaded, no markers computed, no embeddings
   drawn, no trajectory inference.
+- The switch-hierarchy explorer joins **hand-curated edges** to
+  manifested sources; it does not derive node-source links from
+  expression statistics or regulator-binding evidence. The
+  `evidence_one_liner` per row is editorial, not computational.
 - No regulator-target inference. The NKX2-1 → SOX2/SOX9 → FGF10/WNT/BMP/SHH
-  axis is the *organizing question*, not something v0 *outputs evidence
-  about*.
+  axis is the *organizing question*, not something the current artifacts
+  *output evidence about* in a quantitative sense.
 
 ## Coverage gaps in the seed entries
 
@@ -40,24 +55,33 @@ mistakes the manifest for something it isn't.
   spatial coverage (Visium, Slide-seq, etc.) is unaddressed.
 - **Proteomics / mass-spec** from LungMAP is not included as a separate
   entry; only the umbrella consortium is referenced.
+- **Switch-hierarchy node coverage** is the nine canonical players in
+  the NKX2-1 → SOX2/SOX9 → FGF10/WNT/BMP/SHH chain. Adjacent regulators
+  (FOXA2, GATA6, ID2, ETV5, BMP receptors, FGFR2b) are deliberately
+  left out of v1.5 to keep curation honest.
 
 ## Scope choices we deliberately made
 
-- **One CLI, one subcommand.** No subcommand framework, no plugin system.
-- **Stdlib only.** No PyYAML, no Pydantic, no Click, no Rich. JSON in,
-  CSV/JSON/Markdown out.
-- **Outputs in-tree.** The generated manifest lives in `metadata/` and is
-  committed to git so GitHub browsers can see it without running anything.
-- **No tests yet.** The smoke test is "the script runs and produces the
-  expected three files." Add real tests when there is a behavior worth
-  pinning (e.g., the v1 HTTP fetcher).
+- **One script per concern.** Three scripts, no subcommand framework,
+  no plugin system, no shared CLI parser.
+- **Stdlib only.** No PyYAML, no Pydantic, no Click, no Rich, no
+  requests. JSON / CSV in, CSV / JSON / Markdown out.
+- **Outputs in-tree.** Generated manifests, verification reports, and
+  the switch-hierarchy report all live in the repo so GitHub browsers
+  can see them without running anything.
+- **No tests yet.** The smoke test is "each script runs and produces
+  the expected output files." Add real tests when there is behavior
+  worth pinning (e.g., when the verifier grows a drift-classification
+  rule, or when the manifest schema changes).
 
 ## Things that look like features but are intentional non-features
 
-- No `--source CELLxGENE` filter. If you want only Census rows, grep the
-  CSV. The manifest is small.
-- No interactive UI. The manifest is a file you read; we do not need a
-  web app.
+- No `--source CELLxGENE` filter on the manifest CLI. If you want only
+  Census rows, grep the CSV. The manifest is small.
+- No automatic re-verification on commit. Run `gain_verify.py`
+  manually; we have not added a CI job because there is nothing in CI
+  yet.
+- No interactive UI. Each output is a file you read.
 - No schema-versioned upgrade path. `schema_version: "0.1"` is in
   `sources.json` so future-us can branch behavior, but we have not
   written any compatibility shim and will not until v0.2 lands.
