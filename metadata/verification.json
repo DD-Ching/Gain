@@ -1,0 +1,179 @@
+{
+  "schema_version": "0.1",
+  "verified_at": "2026-05-03T10:05:10+00:00",
+  "summary": {
+    "total": 12,
+    "ok": 8,
+    "failed": 4
+  },
+  "results": [
+    {
+      "source": "CELLxGENE Census",
+      "dataset_name": "HLCA - Human Lung Cell Atlas (core)",
+      "url": "https://chanzuckerberg.github.io/cellxgene-census/",
+      "result": {
+        "status_code": 200,
+        "content_type": "text/html",
+        "declared_content_length": 21447,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:04:54+00:00"
+      }
+    },
+    {
+      "source": "CELLxGENE Census",
+      "dataset_name": "HLCA - Human Lung Cell Atlas (extended)",
+      "url": "https://chanzuckerberg.github.io/cellxgene-census/",
+      "result": {
+        "status_code": 200,
+        "content_type": "text/html",
+        "declared_content_length": 21447,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:04:55+00:00"
+      }
+    },
+    {
+      "source": "CELLxGENE Census",
+      "dataset_name": "Pan-fetal human cell atlas (Cao et al. 2020)",
+      "url": "https://chanzuckerberg.github.io/cellxgene-census/",
+      "result": {
+        "status_code": 200,
+        "content_type": "text/html",
+        "declared_content_length": 21447,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:04:56+00:00"
+      }
+    },
+    {
+      "source": "CELLxGENE Census",
+      "dataset_name": "Human fetal lung atlas (He et al. 2022)",
+      "url": "https://chanzuckerberg.github.io/cellxgene-census/",
+      "result": {
+        "status_code": 200,
+        "content_type": "text/html",
+        "declared_content_length": 21447,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:04:56+00:00"
+      }
+    },
+    {
+      "source": "LungMAP",
+      "dataset_name": "LungMAP human developmental scRNA-seq projects",
+      "url": "https://data-browser.lungmap.net/apis",
+      "result": {
+        "status_code": 200,
+        "content_type": "text/html",
+        "declared_content_length": 48428,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:04:56+00:00"
+      }
+    },
+    {
+      "source": "LungMAP",
+      "dataset_name": "LungMAP mouse developmental scRNA-seq projects",
+      "url": "https://data-browser.lungmap.net/apis",
+      "result": {
+        "status_code": 200,
+        "content_type": "text/html",
+        "declared_content_length": 48428,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:04:58+00:00"
+      }
+    },
+    {
+      "source": "LungMAP",
+      "dataset_name": "Lung CellCards (curated cell-type definitions)",
+      "url": "https://www.lungmap.net/cell-cards/",
+      "result": {
+        "status_code": 200,
+        "content_type": "text/html",
+        "declared_content_length": null,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:04:59+00:00"
+      }
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "NKX2-1 ChIP-seq experiments (any biosample)",
+      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=NKX2-1&format=json",
+      "result": {
+        "status_code": 404,
+        "content_type": null,
+        "declared_content_length": null,
+        "head_bytes_read": 0,
+        "ok": false,
+        "error": "HTTPError: Not Found",
+        "checked_at": "2026-05-03T10:05:03+00:00"
+      }
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "SOX2 ChIP-seq experiments (any biosample)",
+      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=SOX2&format=json",
+      "result": {
+        "status_code": 404,
+        "content_type": null,
+        "declared_content_length": null,
+        "head_bytes_read": 0,
+        "ok": false,
+        "error": "HTTPError: Not Found",
+        "checked_at": "2026-05-03T10:05:05+00:00"
+      }
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "SOX9 ChIP-seq experiments (any biosample)",
+      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=SOX9&format=json",
+      "result": {
+        "status_code": 404,
+        "content_type": null,
+        "declared_content_length": null,
+        "head_bytes_read": 0,
+        "ok": false,
+        "error": "HTTPError: Not Found",
+        "checked_at": "2026-05-03T10:05:06+00:00"
+      }
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "Lung biosample ATAC-seq / DNase-seq",
+      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ATAC-seq&biosample_ontology.classification=tissue&biosample_ontology.term_name=lung&format=json",
+      "result": {
+        "status_code": 200,
+        "content_type": "application/json",
+        "declared_content_length": null,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:05:08+00:00"
+      }
+    },
+    {
+      "source": "SCREEN",
+      "dataset_name": "Candidate cis-regulatory elements (cCREs) - human lung biosamples",
+      "url": "https://screen.wenglab.org/",
+      "result": {
+        "status_code": 429,
+        "content_type": null,
+        "declared_content_length": null,
+        "head_bytes_read": 0,
+        "ok": false,
+        "error": "HTTPError: Too Many Requests",
+        "checked_at": "2026-05-03T10:05:10+00:00"
+      }
+    }
+  ]
+}
