@@ -83,47 +83,47 @@
     },
     {
       "source": "ENCODE",
-      "dataset_name": "NKX2-1 ChIP-seq experiments (any biosample)",
-      "modality": "ChIP-seq",
-      "stage": "varies",
-      "tissue": "varies (lung-relevant subset is small)",
+      "dataset_name": "Lung tissue TF ChIP-seq (all TFs in lung biosamples)",
+      "modality": "TF ChIP-seq",
+      "stage": "embryonic + postnatal + adult (sparse)",
+      "tissue": "lung (mostly mouse; one human)",
       "access_method": "REST API search",
-      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=NKX2-1&format=json",
+      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=TF+ChIP-seq&biosample_ontology.term_name=lung&format=json",
       "reuse_priority": "medium",
-      "notes": "Lung-specific NKX2-1 ChIP coverage is patchy; record what exists, including non-lung biosamples for sanity checks. Honor 10 GET/sec."
+      "notes": "Verified 2026-05-03 via gain_verify.py: 6 experiments total (EP300 mouse P0; CTCF mouse P0/E14.5/adult and human adult; POLR2A mouse adult). DOCUMENTED GAP: NKX2-1, SOX2, SOX9 ChIP-seq do not exist anywhere in ENCODE in any biosample (target.label queries return zero hits). For lung-developmental TF binding inference, accessibility + motif scanning is required."
     },
     {
       "source": "ENCODE",
-      "dataset_name": "SOX2 ChIP-seq experiments (any biosample)",
-      "modality": "ChIP-seq",
+      "dataset_name": "Lung tissue Histone ChIP-seq",
+      "modality": "Histone ChIP-seq",
       "stage": "varies",
-      "tissue": "varies",
-      "access_method": "REST API search",
-      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=SOX2&format=json",
-      "reuse_priority": "medium",
-      "notes": "SOX2 marks proximal airway progenitors; lung-context ChIP is rare but ESC/neural-context tracks may inform motif use."
-    },
-    {
-      "source": "ENCODE",
-      "dataset_name": "SOX9 ChIP-seq experiments (any biosample)",
-      "modality": "ChIP-seq",
-      "stage": "varies",
-      "tissue": "varies",
-      "access_method": "REST API search",
-      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=SOX9&format=json",
-      "reuse_priority": "medium",
-      "notes": "SOX9 marks distal/alveolar progenitors. Same caveat as SOX2 about lung-context coverage."
-    },
-    {
-      "source": "ENCODE",
-      "dataset_name": "Lung biosample ATAC-seq / DNase-seq",
-      "modality": "ATAC-seq / DNase-seq",
-      "stage": "fetal + adult (subset)",
       "tissue": "lung",
       "access_method": "REST API search",
-      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ATAC-seq&biosample_ontology.classification=tissue&biosample_ontology.term_name=lung&format=json",
+      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=Histone+ChIP-seq&biosample_ontology.term_name=lung&format=json",
       "reuse_priority": "medium",
-      "notes": "Chromatin accessibility complements ChIP for inferring active CREs in lung tissue."
+      "notes": "Verified 2026-05-03: 59 experiments. Indirect regulatory signal: marks active promoters/enhancers (H3K4me3, H3K27ac, etc.), not TF identity. Pair with ATAC-seq + motif scanning to infer specific TF binding."
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "Lung tissue ATAC-seq",
+      "modality": "ATAC-seq",
+      "stage": "varies",
+      "tissue": "lung",
+      "access_method": "REST API search",
+      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ATAC-seq&biosample_ontology.term_name=lung&format=json",
+      "reuse_priority": "medium",
+      "notes": "Verified 2026-05-03: 5 experiments. Sparse but the canonical accessibility assay; use with motif-scanning (e.g., JASPAR) to infer TF binding when direct ChIP is missing."
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "Lung tissue DNase-seq",
+      "modality": "DNase-seq",
+      "stage": "fetal + adult",
+      "tissue": "lung",
+      "access_method": "REST API search",
+      "programmatic_access": "https://www.encodeproject.org/search/?type=Experiment&assay_title=DNase-seq&biosample_ontology.term_name=lung&format=json",
+      "reuse_priority": "medium",
+      "notes": "Verified 2026-05-03: 30 experiments. Older ENCODE accessibility assay; complementary to ATAC-seq for inferring open regulatory regions in lung biosamples."
     },
     {
       "source": "SCREEN",
@@ -134,7 +134,7 @@
       "access_method": "Web UI + GraphQL API + bulk files",
       "programmatic_access": "https://screen.wenglab.org/",
       "reuse_priority": "low",
-      "notes": "Defer to v1. Used for marker-to-regulator linker MVP. Verify endpoint version (V3 era) before scripting."
+      "notes": "Defer to v1.x. Verifier returned 429 on 2026-05-03 (bot detection / rate limit). Either switch to documented GraphQL endpoint with appropriate headers, or back off and try a different entry. Used for marker-to-regulator linker MVP."
     }
   ]
 }

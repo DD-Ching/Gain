@@ -35,7 +35,7 @@ Each node is a gene or pathway in the regulatory chain **NKX2-1 -> SOX2/SOX9 -> 
 | Pan-fetal human cell atlas (Cao et al. 2020) | scRNA-seq | fetal | multi-organ incl. lung | Captures NKX2-1 onset in the fetal endoderm-derived lung epithelial lineage in a multi-organ context. |
 | Human fetal lung atlas (He et al. 2022) | scRNA-seq + spatial | fetal | lung | Resolves NKX2-1 expression across pseudoglandular to canalicular stages with spatial context. |
 | LungMAP human developmental scRNA-seq projects | scRNA-seq | fetal + postnatal | lung | Stage-resolved NKX2-1 expression across human lung development. |
-| NKX2-1 ChIP-seq experiments (any biosample) | ChIP-seq | varies | varies (lung-relevant subset is small) | Direct regulatory binding map; lung-context coverage is patchy and must be cross-checked. |
+| Lung tissue TF ChIP-seq (all TFs in lung biosamples) | TF ChIP-seq | embryonic + postnatal + adult (sparse) | lung (mostly mouse; one human) | DOCUMENTED GAP: NKX2-1 has zero TF ChIP-seq experiments anywhere in ENCODE (verified 2026-05-03). Lung TF ChIP at all is sparse (6 experiments |
 
 ## SOX2
 
@@ -51,7 +51,7 @@ Each node is a gene or pathway in the regulatory chain **NKX2-1 -> SOX2/SOX9 -> 
 | HLCA - Human Lung Cell Atlas (core) | scRNA-seq | adult | lung | SOX2 enriched in adult airway basal and secretory cells; serves as a proximal-airway identity marker. |
 | Human fetal lung atlas (He et al. 2022) | scRNA-seq + spatial | fetal | lung | SOX2+ proximal airway progenitors distinguishable from SOX9+ distal tip cells in fetal lung. |
 | LungMAP human developmental scRNA-seq projects | scRNA-seq | fetal + postnatal | lung | Cross-stage SOX2 expression along the developing airway tree. |
-| SOX2 ChIP-seq experiments (any biosample) | ChIP-seq | varies | varies | Available SOX2 ChIP is mostly non-lung (ESC/neural); use motif inference for lung-specific predictions. |
+| Lung tissue TF ChIP-seq (all TFs in lung biosamples) | TF ChIP-seq | embryonic + postnatal + adult (sparse) | lung (mostly mouse; one human) | DOCUMENTED GAP: SOX2 has zero TF ChIP-seq experiments in ENCODE in any human or mouse biosample (only one C. elegans hit; verified 2026-05-03). Lung-specific SOX2 binding inference requires accessibility + motif scanning or non-ENCODE sources (e.g. |
 
 ## SOX9
 
@@ -67,7 +67,7 @@ Each node is a gene or pathway in the regulatory chain **NKX2-1 -> SOX2/SOX9 -> 
 | Human fetal lung atlas (He et al. 2022) | scRNA-seq + spatial | fetal | lung | SOX9+ distal tip progenitors give rise to alveolar lineages; clearly resolved in fetal data. |
 | Pan-fetal human cell atlas (Cao et al. 2020) | scRNA-seq | fetal | multi-organ incl. lung | Fetal SOX9 expression in lung distal tips appears in pan-fetal atlas annotations. |
 | LungMAP human developmental scRNA-seq projects | scRNA-seq | fetal + postnatal | lung | Stage-resolved SOX9 dynamics through the canalicular and saccular stages. |
-| SOX9 ChIP-seq experiments (any biosample) | ChIP-seq | varies | varies | Lung-specific SOX9 ChIP coverage is limited; non-lung tracks inform shared cofactor logic only. |
+| Lung tissue TF ChIP-seq (all TFs in lung biosamples) | TF ChIP-seq | embryonic + postnatal + adult (sparse) | lung (mostly mouse; one human) | DOCUMENTED GAP: SOX9 has zero TF ChIP-seq experiments in ENCODE in any biosample (verified 2026-05-03). For lung-specific SOX9 binding inference use accessibility + motif scanning or non-ENCODE sources. |
 
 ## FGF10
 

@@ -1,10 +1,10 @@
 {
   "schema_version": "0.1",
-  "verified_at": "2026-05-03T10:05:10+00:00",
+  "verified_at": "2026-05-03T10:50:56+00:00",
   "summary": {
     "total": 12,
-    "ok": 8,
-    "failed": 4
+    "ok": 11,
+    "failed": 1
   },
   "results": [
     {
@@ -18,7 +18,7 @@
         "head_bytes_read": 4096,
         "ok": true,
         "error": null,
-        "checked_at": "2026-05-03T10:04:54+00:00"
+        "checked_at": "2026-05-03T10:50:43+00:00"
       }
     },
     {
@@ -32,7 +32,7 @@
         "head_bytes_read": 4096,
         "ok": true,
         "error": null,
-        "checked_at": "2026-05-03T10:04:55+00:00"
+        "checked_at": "2026-05-03T10:50:44+00:00"
       }
     },
     {
@@ -46,7 +46,7 @@
         "head_bytes_read": 4096,
         "ok": true,
         "error": null,
-        "checked_at": "2026-05-03T10:04:56+00:00"
+        "checked_at": "2026-05-03T10:50:44+00:00"
       }
     },
     {
@@ -60,7 +60,7 @@
         "head_bytes_read": 4096,
         "ok": true,
         "error": null,
-        "checked_at": "2026-05-03T10:04:56+00:00"
+        "checked_at": "2026-05-03T10:50:44+00:00"
       }
     },
     {
@@ -74,7 +74,7 @@
         "head_bytes_read": 4096,
         "ok": true,
         "error": null,
-        "checked_at": "2026-05-03T10:04:56+00:00"
+        "checked_at": "2026-05-03T10:50:45+00:00"
       }
     },
     {
@@ -88,7 +88,7 @@
         "head_bytes_read": 4096,
         "ok": true,
         "error": null,
-        "checked_at": "2026-05-03T10:04:58+00:00"
+        "checked_at": "2026-05-03T10:50:46+00:00"
       }
     },
     {
@@ -102,55 +102,13 @@
         "head_bytes_read": 4096,
         "ok": true,
         "error": null,
-        "checked_at": "2026-05-03T10:04:59+00:00"
+        "checked_at": "2026-05-03T10:50:47+00:00"
       }
     },
     {
       "source": "ENCODE",
-      "dataset_name": "NKX2-1 ChIP-seq experiments (any biosample)",
-      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=NKX2-1&format=json",
-      "result": {
-        "status_code": 404,
-        "content_type": null,
-        "declared_content_length": null,
-        "head_bytes_read": 0,
-        "ok": false,
-        "error": "HTTPError: Not Found",
-        "checked_at": "2026-05-03T10:05:03+00:00"
-      }
-    },
-    {
-      "source": "ENCODE",
-      "dataset_name": "SOX2 ChIP-seq experiments (any biosample)",
-      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=SOX2&format=json",
-      "result": {
-        "status_code": 404,
-        "content_type": null,
-        "declared_content_length": null,
-        "head_bytes_read": 0,
-        "ok": false,
-        "error": "HTTPError: Not Found",
-        "checked_at": "2026-05-03T10:05:05+00:00"
-      }
-    },
-    {
-      "source": "ENCODE",
-      "dataset_name": "SOX9 ChIP-seq experiments (any biosample)",
-      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ChIP-seq&target.label=SOX9&format=json",
-      "result": {
-        "status_code": 404,
-        "content_type": null,
-        "declared_content_length": null,
-        "head_bytes_read": 0,
-        "ok": false,
-        "error": "HTTPError: Not Found",
-        "checked_at": "2026-05-03T10:05:06+00:00"
-      }
-    },
-    {
-      "source": "ENCODE",
-      "dataset_name": "Lung biosample ATAC-seq / DNase-seq",
-      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ATAC-seq&biosample_ontology.classification=tissue&biosample_ontology.term_name=lung&format=json",
+      "dataset_name": "Lung tissue TF ChIP-seq (all TFs in lung biosamples)",
+      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=TF+ChIP-seq&biosample_ontology.term_name=lung&format=json",
       "result": {
         "status_code": 200,
         "content_type": "application/json",
@@ -158,7 +116,49 @@
         "head_bytes_read": 4096,
         "ok": true,
         "error": null,
-        "checked_at": "2026-05-03T10:05:08+00:00"
+        "checked_at": "2026-05-03T10:50:50+00:00"
+      }
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "Lung tissue Histone ChIP-seq",
+      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=Histone+ChIP-seq&biosample_ontology.term_name=lung&format=json",
+      "result": {
+        "status_code": 200,
+        "content_type": "application/json",
+        "declared_content_length": null,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:50:51+00:00"
+      }
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "Lung tissue ATAC-seq",
+      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=ATAC-seq&biosample_ontology.term_name=lung&format=json",
+      "result": {
+        "status_code": 200,
+        "content_type": "application/json",
+        "declared_content_length": null,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:50:53+00:00"
+      }
+    },
+    {
+      "source": "ENCODE",
+      "dataset_name": "Lung tissue DNase-seq",
+      "url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=DNase-seq&biosample_ontology.term_name=lung&format=json",
+      "result": {
+        "status_code": 200,
+        "content_type": "application/json",
+        "declared_content_length": null,
+        "head_bytes_read": 4096,
+        "ok": true,
+        "error": null,
+        "checked_at": "2026-05-03T10:50:54+00:00"
       }
     },
     {
@@ -172,7 +172,7 @@
         "head_bytes_read": 0,
         "ok": false,
         "error": "HTTPError: Too Many Requests",
-        "checked_at": "2026-05-03T10:05:10+00:00"
+        "checked_at": "2026-05-03T10:50:55+00:00"
       }
     }
   ]
