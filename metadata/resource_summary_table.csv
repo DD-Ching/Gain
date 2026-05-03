@@ -1,0 +1,9 @@
+resource,kind,best_for,access_method,programmatic_url,reuse_strategy,reuse_priority_v0,notes
+CELLxGENE Census,scRNA-seq query layer,standardized cross-dataset scRNA-seq queries,Python and R SDK over TileDB-SOMA,https://chanzuckerberg.github.io/cellxgene-census/,reuse directly,high,LTS snapshots; filter is_primary_data; lung dev coverage inherited from datasets
+HLCA,integrated atlas,adult human lung reference and label transfer,via CELLxGENE Census or h5ad download,https://chanzuckerberg.github.io/cellxgene-census/,reuse directly,medium,Sikkema 2023; ~2.4M cells; adult-biased
+HCA,cross-organ portal,HCA-wide project metadata and bulk download,Azul REST API,https://data.humancellatlas.org/,fallback to Census,medium,use only when Census lacks the dataset
+LungMAP,developmental lung portal,fetal/postnatal lung scRNA-seq + imaging + proteomics,Azul REST API + OMERO for imaging,https://data-browser.lungmap.net/apis,reuse REST directly for metadata,high,verify LungMAP-specific Azul base URL at use time
+ENCODE,functional genomics catalog,ChIP/ATAC/DNase tracks for TFs and lung biosamples,REST API JSON,https://www.encodeproject.org/help/rest-api/,reuse directly with caching,medium,10 GET/sec rate limit; honor with backoff
+SCREEN,cCRE registry,candidate cis-regulatory elements per gene/cell type,GraphQL API + bulk files,https://screen.wenglab.org/,defer to v1,low,verify endpoint at use time; use for marker-to-regulator MVP
+Scanpy,Python analysis library,scRNA-seq preprocessing/embedding/clustering,pip install scanpy,https://scanpy.readthedocs.io/,reuse directly,not needed for manifest CLI,no HTTP API; AnnData-native
+scvi-tools,probabilistic models,label transfer (scANVI) and integration (scVI),pip install scvi-tools,https://docs.scvi-tools.org/,reuse directly,not needed for manifest CLI,GPU recommended for training
