@@ -1,0 +1,13 @@
+regulator,source,n_human_total,n_human_lung,n_mouse_total,n_mouse_lung,lookup_url_human,lookup_url_mouse,lookup_date,notes
+NKX2-1,cistrome,,,,,http://db3.cistrome.org/browser/?factor=NKX2-1&species=Human,http://db3.cistrome.org/browser/?factor=NKX2-1&species=Mouse,,Lookup pending. Cistrome v3 browser is JS-rendered; counts must be read from the rendered page.
+NKX2-1,remap,,,,,https://remap.univ-amu.fr/search?query=NKX2-1&tax_id=9606,https://remap.univ-amu.fr/search?query=NKX2-1&tax_id=10090,,Lookup pending. ReMap REST API redirects to closed port; counts must be read from the search UI.
+SOX2,cistrome,,,,,http://db3.cistrome.org/browser/?factor=SOX2&species=Human,http://db3.cistrome.org/browser/?factor=SOX2&species=Mouse,,Lookup pending. SOX2 is ChIP'd extensively in ESC/neural contexts in GEO; expect non-zero counts here.
+SOX2,remap,,,,,https://remap.univ-amu.fr/search?query=SOX2&tax_id=9606,https://remap.univ-amu.fr/search?query=SOX2&tax_id=10090,,Lookup pending.
+SOX9,cistrome,,,,,http://db3.cistrome.org/browser/?factor=SOX9&species=Human,http://db3.cistrome.org/browser/?factor=SOX9&species=Mouse,,Lookup pending.
+SOX9,remap,,,,,https://remap.univ-amu.fr/search?query=SOX9&tax_id=9606,https://remap.univ-amu.fr/search?query=SOX9&tax_id=10090,,Lookup pending.
+CTNNB1,cistrome,,,,,http://db3.cistrome.org/browser/?factor=CTNNB1&species=Human,http://db3.cistrome.org/browser/?factor=CTNNB1&species=Mouse,,Lookup pending. Beta-catenin ChIP is technically difficult; expect low counts.
+CTNNB1,remap,,,,,https://remap.univ-amu.fr/search?query=CTNNB1&tax_id=9606,https://remap.univ-amu.fr/search?query=CTNNB1&tax_id=10090,,Lookup pending.
+SMAD1,cistrome,,,,,http://db3.cistrome.org/browser/?factor=SMAD1&species=Human,http://db3.cistrome.org/browser/?factor=SMAD1&species=Mouse,,Lookup pending.
+SMAD1,remap,,,,,https://remap.univ-amu.fr/search?query=SMAD1&tax_id=9606,https://remap.univ-amu.fr/search?query=SMAD1&tax_id=10090,,Lookup pending.
+GLI2,cistrome,,,,,http://db3.cistrome.org/browser/?factor=GLI2&species=Human,http://db3.cistrome.org/browser/?factor=GLI2&species=Mouse,,Lookup pending.
+GLI2,remap,,,,,https://remap.univ-amu.fr/search?query=GLI2&tax_id=9606,https://remap.univ-amu.fr/search?query=GLI2&tax_id=10090,,Lookup pending.

@@ -122,23 +122,26 @@ to match the v0 access reality.
 1. `metadata/regulator_target_pairs.csv` — unchanged from v0 audit.
 2. `metadata/sources.json` — unchanged.
 3. **New:** `metadata/external_chip_lookups.csv` — hand-curatable file
-   with rows per (regulator, source). Schema:
+   with one row per `(regulator, source)` pair (so 6 regulators × 2
+   sources = 12 rows). Schema:
 
 | column | meaning |
 |---|---|
 | regulator | gene symbol, matches `regulator_target_pairs.csv` |
 | source | `cistrome` or `remap` |
-| organism | `human` or `mouse` |
-| tissue_filter | `any` or `lung` |
-| n_experiments | integer ≥ 0, or empty if not yet looked up |
-| lookup_url | the URL that should display the count |
-| lookup_date | ISO date, or empty |
+| n_human_total | integer ≥ 0, or empty if not yet looked up |
+| n_human_lung | integer ≥ 0, or empty |
+| n_mouse_total | integer ≥ 0, or empty |
+| n_mouse_lung | integer ≥ 0, or empty |
+| lookup_url_human | URL to the human-tax search at this source |
+| lookup_url_mouse | URL to the mouse-tax search at this source |
+| lookup_date | ISO date the counts were captured, or empty |
 | notes | optional free text |
 
-In v0 the file is seeded with the URL and `n_experiments` left empty;
-running the audit script reads whatever values exist and treats blanks
-as "lookup_required" (which drives the `unresolved_public_evidence_gap`
-class for affected pairs).
+In v0 the file is seeded with both lookup URLs filled in and all
+`n_*` columns left empty; running the audit script reads whatever
+values exist and treats blanks as `lookup_required` (which drives the
+`unresolved_public_evidence_gap` class for affected pairs).
 
 ## Outputs
 
