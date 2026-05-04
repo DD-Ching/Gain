@@ -1,7 +1,10 @@
 # Gain
 
-An open-source **public-data evidence audit** of the middle-layer
-control logic of human lung development:
+> **Public-data evidence audit + substrate-gap diagnosis for human
+> lung developmental regulators.** Stdlib-only. v0 cycle complete.
+
+A reproducible audit of the middle-layer control logic of human lung
+development:
 
 ```
 NKX2-1  ->  SOX2 / SOX9  ->  FGF10 / WNT / BMP / SHH  ->  airway / alveolar programs
@@ -17,18 +20,25 @@ support them.
 
 ## Project status
 
-**v0 cycle complete (2026-05-04).** The audit machinery is mature;
-the constraint reached is the public-data ecosystem.
+**v0 cycle complete (2026-05-04). Frozen as an evidence-audit /
+substrate-gap repo.** The audit machinery is mature; the constraint
+reached is the public-data ecosystem. Future scientific questions
+move to a separate repository; see
+[`notes/next_project_decision.md`](notes/next_project_decision.md).
 
-**Start here:**
-- [`notes/project_summary.md`](notes/project_summary.md) — full
-  narrative for a new researcher (project goal, what was built, what
-  was learned per regulator, why the chain stopped, why the
-  indirect-evidence layer was tested + failed, standing outputs).
-- [`notes/key_findings.md`](notes/key_findings.md) — concise bullet
-  list of what is genuinely established.
-- [`notes/limitations_and_next_methods.md`](notes/limitations_and_next_methods.md)
-  — six method-level future directions sized honestly.
+### Start here (in order)
+
+1. **[`notes/project_summary.md`](notes/project_summary.md)** — full
+   narrative for a new researcher (project goal, what was built, what
+   was learned per regulator, why the chain stopped, why the
+   indirect-evidence layer was tested + failed, standing outputs).
+2. **[`notes/key_findings.md`](notes/key_findings.md)** — concise
+   bullet list of what is genuinely established.
+3. **[`notes/limitations_and_next_methods.md`](notes/limitations_and_next_methods.md)**
+   — six method-level future directions sized honestly.
+4. **[`notes/next_project_decision.md`](notes/next_project_decision.md)**
+   — decision memo for the successor project (cell-type ATAC vs
+   CELLxGENE Census), with a recommended pick.
 
 ## What this repo establishes
 
