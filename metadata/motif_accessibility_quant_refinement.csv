@@ -1,0 +1,15 @@
+regulator,target,category,motif_id,n_motif_hits_in_window,n_fetal_peaks_in_window,n_motif_hits_in_fetal_peaks,n_supporting_fetal_experiments,motif_capture_rate,motif_density_per_fetal_peak,cross_donor_consistency,combined_quant_score,rank_within_sox2_set,separation_verdict
+NKX2-1,SFTPC,nkx21_canonical,MA1994.2,198,133,34,11,0.1717,0.2556,0.8462,0.1453,,not_salvageable
+NKX2-1,SCGB1A1,nkx21_canonical,MA1994.2,256,168,47,11,0.1836,0.2798,0.8462,0.1553,,not_salvageable
+NKX2-1,ABCA3,nkx21_canonical,MA1994.2,256,57,33,8,0.1289,0.5789,0.6154,0.0793,,not_salvageable
+NKX2-1,FOXA2,nkx21_canonical,MA1994.2,254,103,62,12,0.2441,0.6019,0.9231,0.2253,,not_salvageable
+SOX2,TP63,sox2_canonical,MA0143.5,473,31,14,5,0.0296,0.4516,0.3846,0.0114,9,not_salvageable
+SOX2,KRT5,sox2_canonical,MA0143.5,390,51,24,11,0.0615,0.4706,0.8462,0.0521,7,not_salvageable
+SOX2,MUC5B,sox2_canonical,MA0143.5,221,145,38,10,0.1719,0.2621,0.7692,0.1323,6,not_salvageable
+SOX2,FOXJ1,sox2_canonical,MA0143.5,291,131,40,13,0.1375,0.3053,1.0,0.1375,5,not_salvageable
+SOX2,SCGB1A1,sox2_canonical,MA0143.5,337,168,53,13,0.1573,0.3155,1.0,0.1573,4,not_salvageable
+SOX2_control,GAPDH,control_housekeeping,MA0143.5,313,172,66,12,0.2109,0.3837,0.9231,0.1946,3,not_salvageable
+SOX2_control,ACTB,control_housekeeping,MA0143.5,207,311,157,12,0.7585,0.5048,0.9231,0.7001,1,not_salvageable
+SOX2_control,HBA1,control_blood_specific,MA0143.5,280,75,5,3,0.0179,0.0667,0.2308,0.0041,10,not_salvageable
+SOX2_control,HBB,control_blood_specific,MA0143.5,475,42,15,6,0.0316,0.3571,0.4615,0.0146,8,not_salvageable
+SOX2_control,SFTPC,control_lung_wrong_program,MA0143.5,228,133,48,13,0.2105,0.3609,1.0,0.2105,2,not_salvageable
