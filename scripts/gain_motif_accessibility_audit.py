@@ -32,7 +32,7 @@ from gain_peak_intersection import parse_bed_gz  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_OUT = REPO_ROOT / "metadata" / "nkx21_motif_accessibility_audit.csv"
-JASPAR_CACHE = REPO_ROOT / "metadata" / "cache" / "jaspar_MA1994.2.json"
+JASPAR_CACHE_DIR = REPO_ROOT / "metadata" / "cache"
 
 USER_AGENT = "gain-motif-accessibility/0.1 (+https://github.com/DD-Ching/Gain)"
 WINDOW_BP = 50_000
@@ -117,9 +117,14 @@ def http_get_json(url: str, timeout: float = 20.0) -> dict | None:
 # ---------- JASPAR PFM ----------
 
 def fetch_jaspar_pfm(motif_id: str) -> dict[str, list[int]]:
-    """Fetch and cache the PFM for `motif_id` from JASPAR Elixir."""
-    if JASPAR_CACHE.exists():
-        with JASPAR_CACHE.open() as f:
+    """Fetch and cache the PFM for `motif_id` from JASPAR Elixir.
+
+    Cache path derived from motif_id so this function is reusable across
+    motif IDs (NKX2-1, SOX2, etc.).
+    """
+    cache_path = JASPAR_CACHE_DIR / f"jaspar_{motif_id}.json"
+    if cache_path.exists():
+        with cache_path.open() as f:
             return json.load(f)
     url = f"{JASPAR_BASE}/{motif_id}/?format=jaspar"
     print(f"  fetching JASPAR PFM {motif_id} from {url}")
@@ -146,11 +151,192 @@ def fetch_jaspar_pfm(motif_id: str) -> dict[str, list[int]]:
                 pass
     if not all(pfm[b] for b in "ACGT") or len(set(len(pfm[b]) for b in "ACGT")) != 1:
         raise RuntimeError(f"PFM parse failed for {motif_id}: {pfm}")
-    JASPAR_CACHE.parent.mkdir(parents=True, exist_ok=True)
-    with JASPAR_CACHE.open("w") as f:
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    with cache_path.open("w") as f:
         json.dump(pfm, f)
-    print(f"  cached PFM at {JASPAR_CACHE.relative_to(REPO_ROOT)} (motif length {len(pfm['A'])})")
+    print(f"  cached PFM at {cache_path.relative_to(REPO_ROOT)} (motif length {len(pfm['A'])})")
     return pfm
+
+
+def run_motif_accessibility_audit(
+    regulator: str,
+    motif_id: str,
+    targets: dict,
+    out_path: Path,
+    sleep: float = 0.3,
+    threshold: float = MOTIF_RELATIVE_SCORE_THRESHOLD,
+) -> int:
+    """Reusable pipeline. Used by main() with NKX2-1 defaults and by sibling
+    audit scripts (SOX2, controls) with their own (motif_id, targets, out_path).
+    Returns 0 on success, non-zero on error."""
+    print(f"{regulator} motif + accessibility audit ({len(targets)} targets x {len(EXPERIMENTS)} lung experiments)")
+    print(f"  motif: JASPAR {motif_id}")
+    print(f"  threshold: relative_score >= {threshold}")
+    print(f"  window: +/- {WINDOW_BP} bp around TSS")
+    print()
+
+    pfm = fetch_jaspar_pfm(motif_id)
+    pwm = pfm_to_log_odds(pfm)
+    motif_len = len(pwm["A"])
+
+    print(f"\nFetching sequence + scanning motif per target...")
+    target_data: dict[str, dict] = {}
+    for target_name, target in targets.items():
+        start = target["tss"] - WINDOW_BP
+        end = target["tss"] + WINDOW_BP
+        seq = fetch_hg38_window(target["chrom"], start, end)
+        if seq is None:
+            print(f"  {target_name}: sequence fetch FAILED")
+            target_data[target_name] = {"start": start, "end": end, "seq": None, "hits": None}
+            time.sleep(sleep)
+            continue
+        hits = scan_pwm(pwm, seq, threshold_relative=threshold)
+        target_data[target_name] = {"start": start, "end": end, "seq": seq, "hits": hits}
+        print(f"  {target_name}: seq {len(seq)} bp, {len(hits)} motif hits at relative_score >= {threshold}")
+        time.sleep(sleep)
+
+    target_peaks: dict[str, list[dict]] = {tn: [] for tn in targets}
+    print(f"\nFetching ENCODE lung accessibility peak files...")
+    for i, e in enumerate(EXPERIMENTS, 1):
+        print(f"  [{i:>2}/{len(EXPERIMENTS)}] {e['id']} ({e['assay']:<9} {e['stage']:<5} | {e['label']})", end=" ")
+        url, label = best_lung_peak_file_url(e["id"])
+        if url is None:
+            print(f"NO PEAK FILE ({label})")
+            time.sleep(sleep)
+            continue
+        time.sleep(sleep)
+        blob = http_get_bytes(url)
+        if blob is None:
+            print(f"DOWNLOAD FAILED")
+            time.sleep(sleep)
+            continue
+        peaks = parse_bed_gz(blob)
+        for target_name, target in targets.items():
+            for c, s, ed in peaks:
+                if c != target["chrom"]:
+                    continue
+                w_start = target["tss"] - WINDOW_BP
+                w_end = target["tss"] + WINDOW_BP
+                if ed >= w_start and s <= w_end:
+                    target_peaks[target_name].append({
+                        "exp_id": e["id"], "assay": e["assay"], "stage": e["stage"],
+                        "peak_start": s, "peak_end": ed,
+                    })
+        print(f"-> {len(peaks):>5} peaks parsed")
+        time.sleep(sleep)
+
+    out_rows: list[dict] = []
+    print(f"\nIntersecting motif hits with lung accessibility peaks...")
+    for target_name, target in targets.items():
+        td = target_data[target_name]
+        if td["hits"] is None:
+            cls = "error"
+            row = {f: 0 for f in OUT_FIELDS}
+            row["regulator"] = regulator
+            row["target"] = target_name
+            row["target_locus"] = f"{target['chrom']}:{target['tss']} ({target['strand']}) — {target.get('source', '')}"
+            row["motif_id"] = motif_id
+            row["best_supporting_locus"] = "n/a"
+            row["best_supporting_motif_score"] = "n/a"
+            row["final_class"] = cls
+            row["justification"] = "Sequence fetch failed; cannot classify."
+            row["evidence_url"] = "n/a"
+            out_rows.append(row)
+            continue
+
+        peaks = target_peaks[target_name]
+        n_lung_peaks = len(peaks)
+        n_fetal_peaks = sum(1 for p in peaks if p["stage"] == "fetal")
+        n_adult_peaks = sum(1 for p in peaks if p["stage"] == "adult")
+
+        hits = td["hits"]
+        n_motif_hits = len(hits)
+
+        n_motif_in_lung = 0
+        n_motif_in_fetal = 0
+        n_motif_in_adult = 0
+        fetal_supporting_exps: set[str] = set()
+        adult_supporting_exps: set[str] = set()
+        best_score = -1.0
+        best_locus_pos = None
+
+        for hit in hits:
+            hit_genomic_start = td["start"] + hit["position_in_window"]
+            hit_genomic_end = hit_genomic_start + motif_len - 1
+            in_any_lung = False
+            for p in peaks:
+                if hit_genomic_end >= p["peak_start"] and hit_genomic_start <= p["peak_end"]:
+                    in_any_lung = True
+                    if p["stage"] == "fetal":
+                        n_motif_in_fetal += 1
+                        fetal_supporting_exps.add(p["exp_id"])
+                    else:
+                        n_motif_in_adult += 1
+                        adult_supporting_exps.add(p["exp_id"])
+                    if hit["relative_score"] > best_score:
+                        best_score = hit["relative_score"]
+                        best_locus_pos = hit_genomic_start
+            if in_any_lung:
+                n_motif_in_lung += 1
+
+        cls = classify(n_motif_in_fetal, n_motif_in_adult, n_lung_peaks, n_motif_hits)
+        out_rows.append({
+            "regulator": regulator,
+            "target": target_name,
+            "target_locus": f"{target['chrom']}:{target['tss']} ({target['strand']}) — {target.get('source', '')}",
+            "motif_id": motif_id,
+            "n_motif_hits_in_window": n_motif_hits,
+            "n_lung_peaks_in_window": n_lung_peaks,
+            "n_fetal_peaks_in_window": n_fetal_peaks,
+            "n_adult_peaks_in_window": n_adult_peaks,
+            "n_motif_hits_in_lung_peaks": n_motif_in_lung,
+            "n_motif_hits_in_fetal_peaks": n_motif_in_fetal,
+            "n_motif_hits_in_adult_peaks": n_motif_in_adult,
+            "n_supporting_fetal_experiments": len(fetal_supporting_exps),
+            "n_supporting_adult_experiments": len(adult_supporting_exps),
+            "best_supporting_locus": f"{target['chrom']}:{best_locus_pos}" if best_locus_pos else "n/a",
+            "best_supporting_motif_score": f"{best_score:.3f}" if best_score >= 0 else "n/a",
+            "final_class": cls,
+            "justification": justify(cls, target_name, n_motif_hits, n_lung_peaks,
+                                      n_fetal_peaks, n_adult_peaks,
+                                      n_motif_in_fetal, n_motif_in_adult,
+                                      len(fetal_supporting_exps), len(adult_supporting_exps)),
+            "evidence_url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=DNase-seq&biosample_ontology.term_name=lung&replicates.library.biosample.donor.organism.scientific_name=Homo+sapiens",
+        })
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with out_path.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=OUT_FIELDS)
+        w.writeheader()
+        for row in out_rows:
+            w.writerow(row)
+
+    try:
+        out_display = str(out_path.relative_to(REPO_ROOT))
+    except ValueError:
+        out_display = str(out_path)
+    print(f"\nwrote {out_display}")
+    print(f"  generated_at: {datetime.now(timezone.utc).isoformat(timespec='seconds')}")
+    print(f"\n  Per-pair results:")
+    for row in out_rows:
+        print(f"    {regulator} -> {row['target']:<8} "
+              f"motif={row['n_motif_hits_in_window']:>4} | "
+              f"lung_peaks={row['n_lung_peaks_in_window']:>4} (fetal={row['n_fetal_peaks_in_window']}, adult={row['n_adult_peaks_in_window']}) | "
+              f"motif_in_fetal={row['n_motif_hits_in_fetal_peaks']:>3} ({row['n_supporting_fetal_experiments']} expts) "
+              f"-> {row['final_class']}")
+
+    counts_by_class = {c: 0 for c in CLASSES}
+    for r in out_rows:
+        counts_by_class[r["final_class"]] = counts_by_class.get(r["final_class"], 0) + 1
+    print(f"\n  Class counts:")
+    for c in CLASSES:
+        if counts_by_class[c] > 0:
+            print(f"    {c}: {counts_by_class[c]}")
+
+    n_positive = (counts_by_class.get("indirect_accessibility_support_in_fetal_lung_tissue", 0)
+                  + counts_by_class.get("indirect_accessibility_support_in_adult_lung_tissue_only", 0))
+    print(f"\n  Positive: {n_positive} of {len(targets)} pairs cross indirect-evidence threshold")
+    return 0
 
 
 def pfm_to_log_odds(pfm: dict[str, list[int]],
@@ -323,184 +509,14 @@ def main(argv: list[str] | None = None) -> int:
                         default=MOTIF_RELATIVE_SCORE_THRESHOLD,
                         help="motif relative_score threshold (default 0.85)")
     args = parser.parse_args(argv)
-
-    print(f"NKX2-1 motif + accessibility audit (4 targets x 15 lung experiments)")
-    print(f"  motif: JASPAR {NKX21_MOTIF_ID} (Nkx2-1)")
-    print(f"  threshold: relative_score >= {args.threshold}")
-    print(f"  window: +/- {WINDOW_BP} bp around TSS")
-    print()
-
-    # 1. Fetch motif PFM and convert
-    pfm = fetch_jaspar_pfm(NKX21_MOTIF_ID)
-    pwm = pfm_to_log_odds(pfm)
-    motif_len = len(pwm["A"])
-
-    # 2. Per target: fetch sequence and scan motif
-    print(f"\nFetching sequence + scanning motif per target...")
-    target_data: dict[str, dict] = {}
-    for target_name, target in TARGETS.items():
-        start = target["tss"] - WINDOW_BP
-        end = target["tss"] + WINDOW_BP
-        seq = fetch_hg38_window(target["chrom"], start, end)
-        if seq is None:
-            print(f"  {target_name}: sequence fetch FAILED")
-            target_data[target_name] = {"start": start, "end": end, "seq": None, "hits": None}
-            time.sleep(args.sleep)
-            continue
-        hits = scan_pwm(pwm, seq, threshold_relative=args.threshold)
-        target_data[target_name] = {"start": start, "end": end, "seq": seq, "hits": hits}
-        print(f"  {target_name}: seq {len(seq)} bp, {len(hits)} motif hits at "
-              f"relative_score >= {args.threshold}")
-        time.sleep(args.sleep)
-
-    # 3. Per experiment: download peak BED and store per target
-    target_peaks: dict[str, list[dict]] = {tn: [] for tn in TARGETS}
-    print(f"\nFetching ENCODE lung accessibility peak files...")
-    for i, e in enumerate(EXPERIMENTS, 1):
-        print(f"  [{i:>2}/{len(EXPERIMENTS)}] {e['id']} ({e['assay']:<9} {e['stage']:<5} | {e['label']})", end=" ")
-        url, label = best_lung_peak_file_url(e["id"])
-        if url is None:
-            print(f"NO PEAK FILE ({label})")
-            time.sleep(args.sleep)
-            continue
-        time.sleep(args.sleep)
-        blob = http_get_bytes(url)
-        if blob is None:
-            print(f"DOWNLOAD FAILED")
-            time.sleep(args.sleep)
-            continue
-        peaks = parse_bed_gz(blob)
-        # filter to each target's window and chromosome
-        for target_name, target in TARGETS.items():
-            for c, s, ed in peaks:
-                if c != target["chrom"]:
-                    continue
-                w_start = target["tss"] - WINDOW_BP
-                w_end = target["tss"] + WINDOW_BP
-                # peak overlaps window if peak end > window start AND peak start < window end
-                if ed >= w_start and s <= w_end:
-                    target_peaks[target_name].append({
-                        "exp_id": e["id"], "assay": e["assay"], "stage": e["stage"],
-                        "peak_start": s, "peak_end": ed,
-                    })
-        print(f"-> {len(peaks):>5} peaks parsed")
-        time.sleep(args.sleep)
-
-    # 4. Per target: classify
-    out_rows: list[dict] = []
-    print(f"\nIntersecting motif hits with lung accessibility peaks...")
-    for target_name, target in TARGETS.items():
-        td = target_data[target_name]
-        if td["hits"] is None:
-            cls = "error"
-            row = {f: 0 for f in OUT_FIELDS}
-            row["regulator"] = "NKX2-1"
-            row["target"] = target_name
-            row["target_locus"] = f"{target['chrom']}:{target['tss']} ({target['strand']}) — {target['source']}"
-            row["motif_id"] = NKX21_MOTIF_ID
-            row["best_supporting_locus"] = "n/a"
-            row["best_supporting_motif_score"] = "n/a"
-            row["final_class"] = cls
-            row["justification"] = "Sequence fetch failed; cannot classify."
-            row["evidence_url"] = "n/a"
-            out_rows.append(row)
-            continue
-
-        peaks = target_peaks[target_name]
-        n_lung_peaks = len(peaks)
-        n_fetal_peaks = sum(1 for p in peaks if p["stage"] == "fetal")
-        n_adult_peaks = sum(1 for p in peaks if p["stage"] == "adult")
-
-        hits = td["hits"]
-        n_motif_hits = len(hits)
-
-        # Convert hit positions to absolute genomic coordinates and check overlap with peaks
-        n_motif_in_lung = 0
-        n_motif_in_fetal = 0
-        n_motif_in_adult = 0
-        fetal_supporting_exps: set[str] = set()
-        adult_supporting_exps: set[str] = set()
-        best_score = -1.0
-        best_locus_pos = None
-
-        for hit in hits:
-            hit_genomic_start = td["start"] + hit["position_in_window"]
-            hit_genomic_end = hit_genomic_start + motif_len - 1
-            in_any_lung = False
-            for p in peaks:
-                # motif overlaps peak if motif end >= peak start AND motif start <= peak end
-                if hit_genomic_end >= p["peak_start"] and hit_genomic_start <= p["peak_end"]:
-                    in_any_lung = True
-                    if p["stage"] == "fetal":
-                        n_motif_in_fetal += 1
-                        fetal_supporting_exps.add(p["exp_id"])
-                    else:
-                        n_motif_in_adult += 1
-                        adult_supporting_exps.add(p["exp_id"])
-                    if hit["relative_score"] > best_score:
-                        best_score = hit["relative_score"]
-                        best_locus_pos = hit_genomic_start
-            if in_any_lung:
-                n_motif_in_lung += 1
-
-        cls = classify(n_motif_in_fetal, n_motif_in_adult, n_lung_peaks, n_motif_hits)
-        out_rows.append({
-            "regulator": "NKX2-1",
-            "target": target_name,
-            "target_locus": f"{target['chrom']}:{target['tss']} ({target['strand']}) — {target['source']}",
-            "motif_id": NKX21_MOTIF_ID,
-            "n_motif_hits_in_window": n_motif_hits,
-            "n_lung_peaks_in_window": n_lung_peaks,
-            "n_fetal_peaks_in_window": n_fetal_peaks,
-            "n_adult_peaks_in_window": n_adult_peaks,
-            "n_motif_hits_in_lung_peaks": n_motif_in_lung,
-            "n_motif_hits_in_fetal_peaks": n_motif_in_fetal,
-            "n_motif_hits_in_adult_peaks": n_motif_in_adult,
-            "n_supporting_fetal_experiments": len(fetal_supporting_exps),
-            "n_supporting_adult_experiments": len(adult_supporting_exps),
-            "best_supporting_locus": f"{target['chrom']}:{best_locus_pos}" if best_locus_pos else "n/a",
-            "best_supporting_motif_score": f"{best_score:.3f}" if best_score >= 0 else "n/a",
-            "final_class": cls,
-            "justification": justify(cls, target_name, n_motif_hits, n_lung_peaks,
-                                      n_fetal_peaks, n_adult_peaks,
-                                      n_motif_in_fetal, n_motif_in_adult,
-                                      len(fetal_supporting_exps), len(adult_supporting_exps)),
-            "evidence_url": "https://www.encodeproject.org/search/?type=Experiment&assay_title=DNase-seq&biosample_ontology.term_name=lung&replicates.library.biosample.donor.organism.scientific_name=Homo+sapiens",
-        })
-
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    with args.out.open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=OUT_FIELDS)
-        w.writeheader()
-        for row in out_rows:
-            w.writerow(row)
-
-    print(f"\nwrote {args.out.relative_to(REPO_ROOT)}")
-    print(f"  generated_at: {datetime.now(timezone.utc).isoformat(timespec='seconds')}")
-    print(f"\n  Per-pair results:")
-    for row in out_rows:
-        print(f"    NKX2-1 -> {row['target']:<8} "
-              f"motif={row['n_motif_hits_in_window']:>4} | "
-              f"lung_peaks={row['n_lung_peaks_in_window']:>4} (fetal={row['n_fetal_peaks_in_window']}, adult={row['n_adult_peaks_in_window']}) | "
-              f"motif_in_fetal={row['n_motif_hits_in_fetal_peaks']:>3} ({row['n_supporting_fetal_experiments']} expts) "
-              f"-> {row['final_class']}")
-
-    counts_by_class = {c: 0 for c in CLASSES}
-    for r in out_rows:
-        counts_by_class[r["final_class"]] = counts_by_class.get(r["final_class"], 0) + 1
-    print(f"\n  Class counts:")
-    for c in CLASSES:
-        if counts_by_class[c] > 0:
-            print(f"    {c}: {counts_by_class[c]}")
-
-    n_positive = (counts_by_class.get("indirect_accessibility_support_in_fetal_lung_tissue", 0)
-                  + counts_by_class.get("indirect_accessibility_support_in_adult_lung_tissue_only", 0))
-    print(f"\n  Decision checkpoint: {n_positive} of 4 pairs cross the positive threshold")
-    if n_positive >= 2:
-        print(f"    -> >= 2 positive: report and recommend expansion direction")
-    else:
-        print(f"    -> < 2 positive: do not expand to SOX2; recommend project-summary mode")
-    return 0
+    return run_motif_accessibility_audit(
+        regulator="NKX2-1",
+        motif_id=NKX21_MOTIF_ID,
+        targets=TARGETS,
+        out_path=args.out,
+        sleep=args.sleep,
+        threshold=args.threshold,
+    )
 
 
 if __name__ == "__main__":
